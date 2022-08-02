@@ -49,18 +49,17 @@ def iterrecords(url='http://localhost:8983/solr/biblio', delay=1.0, query='title
             print(err, file=sys.stderr)
             sys.exit(1)
         except socket.error as err:
-            print('connectivity error: %s: %s' % (url, err), file=sys.stderr)
+            print(f'connectivity error: {url}: {err}', file=sys.stderr)
             sys.exit(1)
 
         if len(response) == 0:
             break
         for item in response:
-            if not 'fullrecord' in item:
+            if 'fullrecord' not in item:
                 continue
             record = item['fullrecord'].strip()
             record = record.replace('#31;', '\x1f').replace('#30;', '\x1e').replace('#29;', '\x1d')
-            record = record.encode(encoding)
-            yield record
+            yield record.encode(encoding)
             start += size
             time.sleep(delay * random.random())
 
@@ -86,7 +85,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if not os.path.exists(args.directory):
-        print('no such directory: %s' % args.directory, file=sys.stderr)
+        print(f'no such directory: {args.directory}', file=sys.stderr)
         sys.exit(1)
 
     filenames = namegen(directory=args.directory, prefix=args.prefix)
